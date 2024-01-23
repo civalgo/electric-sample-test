@@ -59,64 +59,58 @@ export const Example = () => {
 };
 
 // const ExampleComponent = () => {
-//   const { db } = useElectric()!
-//   const { results } = useLiveQuery(
-//     db.items.liveMany()
-//   )
+//   const { db } = useElectric()!;
+//   const { results } = useLiveQuery(db.items.liveMany());
 
 //   useEffect(() => {
 //     const syncItems = async () => {
 //       // Resolves when the shape subscription has been established.
-//       const shape = await db.items.sync()
+//       const shape = await db.items.sync();
 
 //       // Resolves when the data has been synced into the local database.
-//       await shape.synced
-//     }
+//       await shape.synced;
+//     };
 
-//     syncItems()
-//   }, [])
+//     syncItems();
+//   }, []);
 
 //   const addItem = async () => {
 //     await db.items.create({
 //       data: {
 //         value: genUUID(),
-//       }
-//     })
-//   }
+//       },
+//     });
+//   };
 
 //   const clearItems = async () => {
-//     await db.items.deleteMany()
-//   }
+//     await db.items.deleteMany();
+//   };
 
-//   const items: Item[] = results ?? []
+//   const items: Item[] = results ?? [];
 
 //   return (
 //     <View>
-//       <View style={ styles.iconContainer }>
-//         <Image source={require('../assets/icon.png')} />
+//       <View style={styles.iconContainer}>
+//         <Image source={require("../assets/icon.png")} />
 //       </View>
-//       <View style={ styles.buttons }>
-//         <Pressable style={ styles.button } onPress={ addItem }>
-//           <Text style={ styles.text }>
-//             Add
-//           </Text>
+//       <View style={styles.buttons}>
+//         <Pressable style={styles.button} onPress={addItem}>
+//           <Text style={styles.text}>Add</Text>
 //         </Pressable>
-//         <Pressable style={ styles.button } onPress={ clearItems }>
-//           <Text style={ styles.text }>
-//             Clear
-//           </Text>
+//         <Pressable style={styles.button} onPress={clearItems}>
+//           <Text style={styles.text}>Clear</Text>
 //         </Pressable>
 //       </View>
-//       <View style={ styles.items }>
+//       <View style={styles.items}>
 //         {items.map((item: Item, index: number) => (
-//           <Text key={ index } style={ styles.item }>
-//             Item { index + 1 }
+//           <Text key={index} style={styles.item}>
+//             Item {index + 1}
 //           </Text>
 //         ))}
 //       </View>
 //     </View>
-//   )
-// }
+//   );
+// };
 
 const ExampleComponentCivalgo = () => {
   const { db } = useElectric()!;
