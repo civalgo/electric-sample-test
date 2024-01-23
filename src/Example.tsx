@@ -114,41 +114,15 @@ export const Example = () => {
 
 const ExampleComponentCivalgo = () => {
   const { db } = useElectric()!;
-  // const { results } = useLiveQuery(db.User.liveMany());
-
-  // console.log(results);
+  const { results } = useLiveQuery(db.User.liveMany());
 
   useEffect(() => {
     const syncItems = async () => {
       // Resolves when the shape subscription has been established.
       const shape = await db.User.sync({
         include: {
-          ApiKey: true,
-          DailyLog: true,
-          DailyLogItem: true,
-          Equipment_Equipment_createdByToUser: true,
-          Equipment_Equipment_userIdToUser: true,
-          EquipmentProperty: true,
-          EquipmentPropertyValue: true,
-          Feedback: true,
-          File: true,
-          FileProperty: true,
-          FilePropertyValue: true,
-          Image_Image_createdByToUser: true,
-          LocationEntry: true,
-          Project: true,
-          ProjectProperty: true,
-          ProjectPropertyValue: true,
-          Task: true,
-          TaskProperty: true,
-          TaskPropertyValue: true,
-          TaskStatus: true,
           Tenant_Tenant_createdByToUser: true,
-          TenantUser_TenantUser_createdByToUser: true,
-          TenantUser_TenantUser_userIdToUser: true,
-          TimeBlock: true,
-          UserTask_UserTask_createdByToUser: true,
-          UserTask_UserTask_userIdToUser: true,
+          Image_Image_createdByToUser: true,
         },
       });
 
@@ -161,22 +135,24 @@ const ExampleComponentCivalgo = () => {
 
   const addItem = async () => {
     try {
-      const newTenant = await db.Tenant.create({
+      const tenantId = genUUID();
+      await db.Tenant.create({
         data: {
-          id: genUUID(),
-          name: "tenantName",
+          id: tenantId,
+          name: "tenantName" + genUUID(),
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
         },
       });
 
-      const newUser = await db.User.create({
+      await db.User.create({
         data: {
           id: genUUID(),
           email: `${genUUID()}@example.com`,
+          name: `randomName` + genUUID(),
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
-          currentTenantId: newTenant.id,
+          currentTenantId: tenantId,
         },
       });
     } catch (error) {
@@ -197,6 +173,8 @@ const ExampleComponentCivalgo = () => {
     }
   };
 
+  const items = results ?? [];
+
   return (
     <View>
       <View style={styles.iconContainer}>
@@ -213,13 +191,13 @@ const ExampleComponentCivalgo = () => {
           <Text style={styles.text}>Find</Text>
         </Pressable>
       </View>
-      {/* <View style={styles.items}>
-        {items.map((item: Item, index: number) => (
+      <View style={styles.items}>
+        {items.map((item, index: number) => (
           <Text key={index} style={styles.item}>
-            Item {index + 1}
+            Item {index + 1} - {item.name}
           </Text>
         ))}
-      </View> */}
+      </View>
     </View>
   );
 };
