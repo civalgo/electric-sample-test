@@ -2,7 +2,7 @@ const { DATABASE_URL, PUBLIC_DATABASE_URL } = require("./util.js");
 const { spawn } = require("child_process");
 const process = require("process");
 
-console.info(`Connecting to proxy at ${PUBLIC_DATABASE_URL}`);
+console.info(`Migrating civalgo data with proxy at ${PUBLIC_DATABASE_URL}`);
 
 const args = [
   "run",
@@ -12,7 +12,7 @@ const args = [
   "--database",
   DATABASE_URL,
   "--directory",
-  "./db/migrations-items",
+  "./db/electrify-sql",
 ];
 const proc = spawn("yarn", args, {
   cwd: __dirname,

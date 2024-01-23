@@ -13,11 +13,17 @@
     "client:watch": "yarn client:generate --watch",
     "db:migrate": "node ./db/migrate.js",
     "db:psql": "node ./db/connect.js",
+    "db:electify": "node ./db/electify-tables.js",
     "electric:check": "node ./check-electric-is-running.js",
     "ports:configure": "node ./change-ports.js",
     "start": "expo start",
     "start:android": "expo start --android",
-    "start:ios": "expo start --ios"
+    "start:ios": "expo start --ios",
+    "civalgo:migrate-prisma": "yarn prisma migrate dev --schema db/schema.prisma",
+    "civalgo:reset": "yarn backend:down && rimraf src/generated && yarn backend:up",
+    "civalgo:migrate": "yarn civalgo:migrate-prisma && yarn db:electify && yarn client:generate",
+    "reset:items": "yarn backend:down && rimraf src/generated && yarn backend:up",
+    "migrate:items": "yarn db:migrate && yarn client:generate"
   },
   "dependencies": {
     "electric-sql": "^0.7.0",

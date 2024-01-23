@@ -1,0 +1,536 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = "native"
+}
+
+model DailyLog {
+  id String @id
+
+  date        DateTime? @db.Date
+  status      String
+  note        String
+  rating      Int
+  ratingNote  String
+  managerNote String
+  createdAt   DateTime  @db.Timestamptz()
+  updatedAt   DateTime  @db.Timestamptz()
+  archivedAt  DateTime? @db.Timestamptz()
+  deletedAt   DateTime? @db.Timestamptz()
+
+  createdBy     String?
+  createdByUser User?   @relation(fields: [createdBy], references: [id])
+  tenantId      String
+  tenant        Tenant  @relation(fields: [tenantId], references: [id])
+
+  files           File[]
+  dailyLogItems   DailyLogItem[]
+  locationEntries LocationEntry[]
+}
+
+model DailyLogItem {
+  id String @id
+
+  note          String?
+  isNoteVisible Boolean?
+  itemType      String
+  createdAt     DateTime  @db.Timestamptz()
+  updatedAt     DateTime  @db.Timestamptz()
+  archivedAt    DateTime? @db.Timestamptz()
+  deletedAt     DateTime? @db.Timestamptz()
+
+  createdBy     String?
+  createdByUser User?      @relation(fields: [createdBy], references: [id])
+  taskId        String?
+  task          Task?      @relation(fields: [taskId], references: [id])
+  dailyLogId    String
+  dailyLog      DailyLog   @relation(fields: [dailyLogId], references: [id])
+  tenantId      String
+  tenant        Tenant     @relation(fields: [tenantId], references: [id])
+  equipmentId   String?
+  equipment     Equipment? @relation(fields: [equipmentId], references: [id])
+
+  timeBlocks TimeBlock[]
+}
+
+model Feedback {
+  id String @id
+
+  text String?
+
+  createdAt  DateTime  @db.Timestamptz()
+  updatedAt  DateTime  @db.Timestamptz()
+  archivedAt DateTime? @db.Timestamptz()
+  deletedAt  DateTime? @db.Timestamptz()
+
+  createdBy     String?
+  createdByUser User?   @relation(fields: [createdBy], references: [id])
+  tenantId      String
+  tenant        Tenant  @relation(fields: [tenantId], references: [id])
+}
+
+model File {
+  id String @id
+
+  description       String?
+  locationLabel     String?
+  locationLatitude  Float?
+  locationLongitude Float?
+  name              String?
+  type              String?
+  createdAt         DateTime  @db.Timestamptz()
+  updatedAt         DateTime  @db.Timestamptz()
+  archivedAt        DateTime? @db.Timestamptz()
+  deletedAt         DateTime? @db.Timestamptz()
+
+  imageId       String
+  image         Image     @relation(fields: [imageId], references: [id])
+  createdBy     String?
+  createdByUser User?     @relation(fields: [createdBy], references: [id])
+  tenantId      String
+  tenant        Tenant    @relation(fields: [tenantId], references: [id])
+  projectId     String?
+  project       Project?  @relation(fields: [projectId], references: [id])
+  dailyLogId    String?
+  dailyLog      DailyLog? @relation(fields: [dailyLogId], references: [id])
+
+  filePropertyValues FilePropertyValue[]
+}
+
+model FileProperty {
+  id String @id
+
+  name       String
+  createdAt  DateTime  @db.Timestamptz()
+  updatedAt  DateTime  @db.Timestamptz()
+  archivedAt DateTime? @db.Timestamptz()
+  deletedAt  DateTime? @db.Timestamptz()
+
+  createdBy     String?
+  createdByUser User?   @relation(fields: [createdBy], references: [id])
+  tenantId      String
+  tenant        Tenant  @relation(fields: [tenantId], references: [id])
+
+  propertyValues FilePropertyValue[]
+}
+
+model FilePropertyValue {
+  id String @id
+
+  value      String
+  createdAt  DateTime  @db.Timestamptz()
+  updatedAt  DateTime  @db.Timestamptz()
+  archivedAt DateTime? @db.Timestamptz()
+  deletedAt  DateTime? @db.Timestamptz()
+
+  createdBy     String?
+  createdByUser User?        @relation(fields: [createdBy], references: [id])
+  fileId        String
+  file          File?        @relation(fields: [fileId], references: [id])
+  propertyId    String
+  property      FileProperty @relation(fields: [propertyId], references: [id])
+  tenantId      String
+  tenant        Tenant       @relation(fields: [tenantId], references: [id])
+}
+
+model Image {
+  id String @id
+
+  bucketId   String
+  blurhash   String
+  createdAt  DateTime  @db.Timestamptz()
+  updatedAt  DateTime  @db.Timestamptz()
+  archivedAt DateTime? @db.Timestamptz()
+  deletedAt  DateTime? @db.Timestamptz()
+
+  createdBy     String?
+  createdByUser User?   @relation("image_createdBy", fields: [createdBy], references: [id])
+  tenantId      String
+  tenant        Tenant  @relation(fields: [tenantId], references: [id])
+
+  Users User[] @relation("avatarImage")
+  Files File[]
+}
+
+model LocationEntry {
+  id String @id
+
+  latitude   Float?
+  longitude  Float?
+  createdAt  DateTime  @db.Timestamptz()
+  updatedAt  DateTime  @db.Timestamptz()
+  archivedAt DateTime? @db.Timestamptz()
+  deletedAt  DateTime? @db.Timestamptz()
+
+  createdBy     String?
+  createdByUser User?    @relation(fields: [createdBy], references: [id])
+  dailyLogId    String
+  dailyLog      DailyLog @relation(fields: [dailyLogId], references: [id])
+  tenantId      String
+  tenant        Tenant   @relation(fields: [tenantId], references: [id])
+}
+
+model Project {
+  id String @id
+
+  name              String?
+  progress          Float?
+  dueDate           DateTime? @db.Timestamptz()
+  description       String?
+  locationLabel     String?
+  locationLatitude  Float?
+  locationLongitude Float?
+  createdAt         DateTime  @db.Timestamptz()
+  updatedAt         DateTime  @db.Timestamptz()
+  archivedAt        DateTime? @db.Timestamptz()
+  deletedAt         DateTime? @db.Timestamptz()
+
+  createdBy     String?
+  createdByUser User?   @relation(fields: [createdBy], references: [id])
+  tenantId      String
+  tenant        Tenant  @relation(fields: [tenantId], references: [id])
+
+  projectPropertyValues ProjectPropertyValue[]
+  tasks                 Task[]
+  files                 File[]
+}
+
+model ProjectProperty {
+  id String @id
+
+  name       String
+  createdAt  DateTime  @db.Timestamptz()
+  updatedAt  DateTime  @db.Timestamptz()
+  archivedAt DateTime? @db.Timestamptz()
+  deletedAt  DateTime? @db.Timestamptz()
+
+  createdBy     String?
+  createdByUser User?   @relation(fields: [createdBy], references: [id])
+  tenantId      String
+  tenant        Tenant  @relation(fields: [tenantId], references: [id])
+
+  projectPropertyValues ProjectPropertyValue[]
+}
+
+model ProjectPropertyValue {
+  id String @id
+
+  value      String
+  createdAt  DateTime  @db.Timestamptz()
+  updatedAt  DateTime  @db.Timestamptz()
+  archivedAt DateTime? @db.Timestamptz()
+  deletedAt  DateTime? @db.Timestamptz()
+
+  createdBy         String?
+  createdByUser     User?           @relation(fields: [createdBy], references: [id])
+  projectId         String
+  project           Project         @relation(fields: [projectId], references: [id])
+  projectPropertyId String
+  projectProperty   ProjectProperty @relation(fields: [projectPropertyId], references: [id])
+  tenantId          String
+  tenant            Tenant          @relation(fields: [tenantId], references: [id])
+}
+
+model Task {
+  id String @id
+
+  description    String?
+  name           String?
+  statusId       String?
+  systemStatusId String
+  createdAt      DateTime  @db.Timestamptz()
+  updatedAt      DateTime  @db.Timestamptz()
+  archivedAt     DateTime? @db.Timestamptz()
+  deletedAt      DateTime? @db.Timestamptz()
+
+  createdBy     String?
+  createdByUser User?       @relation(fields: [createdBy], references: [id])
+  projectId     String
+  project       Project     @relation(fields: [projectId], references: [id])
+  tenantId      String
+  tenant        Tenant      @relation(fields: [tenantId], references: [id])
+  parentId      String?
+  parent        Task?       @relation("TaskToTask", fields: [parentId], references: [id])
+  taskStatusId  String?
+  TaskStatus    TaskStatus? @relation(fields: [taskStatusId], references: [id])
+
+  dailyLogItems      DailyLogItem[]
+  taskPropertyValues TaskPropertyValue[]
+  userTasks          UserTask[]
+  children           Task[]              @relation("TaskToTask")
+}
+
+model TaskProperty {
+  id String @id
+
+  name       String
+  createdAt  DateTime  @db.Timestamptz()
+  updatedAt  DateTime  @db.Timestamptz()
+  archivedAt DateTime? @db.Timestamptz()
+  deletedAt  DateTime? @db.Timestamptz()
+
+  createdBy     String?
+  createdByUser User?   @relation(fields: [createdBy], references: [id])
+  tenantId      String
+  tenant        Tenant  @relation(fields: [tenantId], references: [id])
+
+  taskPropertyValues TaskPropertyValue[]
+}
+
+model TaskPropertyValue {
+  id String @id
+
+  value      String
+  createdAt  DateTime  @db.Timestamptz()
+  updatedAt  DateTime  @db.Timestamptz()
+  archivedAt DateTime? @db.Timestamptz()
+  deletedAt  DateTime? @db.Timestamptz()
+
+  createdBy      String?
+  createdByUser  User?        @relation(fields: [createdBy], references: [id])
+  taskPropertyId String
+  taskProperty   TaskProperty @relation(fields: [taskPropertyId], references: [id])
+  taskId         String
+  task           Task         @relation(fields: [taskId], references: [id])
+  tenantId       String
+  tenant         Tenant       @relation(fields: [tenantId], references: [id])
+}
+
+model TaskStatus {
+  id String @id
+
+  iconColor String
+  name      String
+  createdAt DateTime  @db.Timestamptz()
+  updatedAt DateTime  @db.Timestamptz()
+  deletedAt DateTime? @db.Timestamptz()
+
+  createdBy     String?
+  createdByUser User?   @relation(fields: [createdBy], references: [id])
+  tenantId      String
+  tenant        Tenant  @relation(fields: [tenantId], references: [id])
+
+  tasks Task[]
+}
+
+model Tenant {
+  id String @id
+
+  name       String
+  createdAt  DateTime  @db.Timestamptz()
+  updatedAt  DateTime  @db.Timestamptz()
+  archivedAt DateTime? @db.Timestamptz()
+  deletedAt  DateTime? @db.Timestamptz()
+
+  createdBy     String?
+  createdByUser User?   @relation(fields: [createdBy], references: [id])
+
+  images                  Image[]
+  equipmentProperties     EquipmentProperty[]
+  equipmentPropertyValues EquipmentPropertyValue[]
+  apiKeys                 ApiKey[]
+  currentTenantUsers      User[]                   @relation("current_tenant")
+  dailyLogs               DailyLog[]
+  dailyLogItems           DailyLogItem[]
+  feedbacks               Feedback[]
+  files                   File[]
+  fileProperties          FileProperty[]
+  filePropertyValues      FilePropertyValue[]
+  locationEntries         LocationEntry[]
+  projects                Project[]
+  projectProperties       ProjectProperty[]
+  projectPropertyValues   ProjectPropertyValue[]
+  tasks                   Task[]
+  taskProperties          TaskProperty[]
+  taskPropertyValues      TaskPropertyValue[]
+  taskStatuses            TaskStatus[]
+  tenantUsers             TenantUser[]
+  timeBlocks              TimeBlock[]
+  userTasks               UserTask[]
+  equipments              Equipment[]
+}
+
+model TenantUser {
+  id String @id
+
+  userRole     String
+  inviteEmail  String?
+  inviteSentAt DateTime? @db.Timestamptz()
+  inviteStatus String?
+  createdAt    DateTime  @db.Timestamptz()
+  updatedAt    DateTime  @db.Timestamptz()
+  archivedAt   DateTime? @db.Timestamptz()
+  deletedAt    DateTime? @db.Timestamptz()
+
+  createdBy     String?
+  createdByUser User?   @relation("tenantUsers_created_by_user", fields: [createdBy], references: [id])
+  userId        String?
+  user          User?   @relation("tenantUsers_user", fields: [userId], references: [id])
+  tenantId      String
+  tenant        Tenant  @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+}
+
+model TimeBlock {
+  id String @id
+
+  duration            Int?
+  entryType           String
+  rangeStartAt        DateTime? @db.Timestamptz()
+  rangeEndAt          DateTime? @db.Timestamptz()
+  timerStartLatitude  Float?
+  timerStartLongitude Float?
+  timerStartAddress   String?
+  timerStartAt        DateTime? @db.Timestamptz()
+  timerEndAt          DateTime? @db.Timestamptz()
+  timerEndLatitude    Float?
+  timerEndLongitude   Float?
+  timerEndAddress     String?
+  createdAt           DateTime  @db.Timestamptz()
+  updatedAt           DateTime  @db.Timestamptz()
+  archivedAt          DateTime? @db.Timestamptz()
+  deletedAt           DateTime? @db.Timestamptz()
+
+  createdBy      String
+  createdByUser  User         @relation(fields: [createdBy], references: [id])
+  dailyLogItemId String
+  dailyLogItem   DailyLogItem @relation(fields: [dailyLogItemId], references: [id])
+  tenantId       String
+  tenant         Tenant       @relation(fields: [tenantId], references: [id])
+}
+
+model User {
+  id String @id
+
+  email             String?
+  name              String?
+  preferredLanguage String?
+  createdAt         DateTime  @db.Timestamptz()
+  updatedAt         DateTime  @db.Timestamptz()
+  archivedAt        DateTime? @db.Timestamptz()
+  deletedAt         DateTime? @db.Timestamptz()
+
+  imageId         String?
+  image           Image?  @relation("avatarImage", fields: [imageId], references: [id])
+  currentTenantId String
+  currentTenant   Tenant  @relation(fields: [currentTenantId], references: [id], name: "current_tenant")
+
+  apiKeys                   ApiKey[]
+  dailyLogs                 DailyLog[]
+  dailyLogItems             DailyLogItem[]
+  files                     File[]
+  fileProperties            FileProperty[]
+  filePropertyValues        FilePropertyValue[]
+  locationEntries           LocationEntry[]
+  projects                  Project[]
+  projectProperties         ProjectProperty[]
+  projectPropertyValues     ProjectPropertyValue[]
+  tasks                     Task[]
+  taskProperties            TaskProperty[]
+  taskPropertyValues        TaskPropertyValue[]
+  taskStatuses              TaskStatus[]
+  tenants                   Tenant[]
+  tenantUsersUsers          TenantUser[]             @relation("tenantUsers_user")
+  tenantUsersCreatedByUsers TenantUser[]             @relation("tenantUsers_created_by_user")
+  timeBlocks                TimeBlock[]
+  userTaskUsers             UserTask[]               @relation("userTask_user")
+  createdUserTasks          UserTask[]               @relation("userTask_created_by_user")
+  createdEquipments         Equipment[]              @relation("equipmentCreatedBy")
+  equipmentProperties       EquipmentProperty[]
+  images                    Image[]                  @relation("image_createdBy")
+  equipmentPropertyValues   EquipmentPropertyValue[]
+  equipments                Equipment[]
+  feedbacks                 Feedback[]
+}
+
+model UserTask {
+  id String @id
+
+  createdAt  DateTime  @db.Timestamptz()
+  updatedAt  DateTime  @db.Timestamptz()
+  archivedAt DateTime? @db.Timestamptz()
+  deletedAt  DateTime? @db.Timestamptz()
+
+  createdBy     String?
+  createdByUser User?   @relation("userTask_created_by_user", fields: [createdBy], references: [id])
+  taskId        String
+  task          Task    @relation(fields: [taskId], references: [id])
+  tenantId      String
+  tenant        Tenant  @relation(fields: [tenantId], references: [id])
+  userId        String
+  user          User    @relation("userTask_user", fields: [userId], references: [id])
+}
+
+model ApiKey {
+  id String @id
+
+  name      String
+  createdAt DateTime @db.Timestamptz()
+
+  tenantId String
+  tenant   Tenant  @relation(fields: [tenantId], references: [id])
+  userId   String?
+  user     User?   @relation(fields: [userId], references: [id])
+}
+
+model Equipment {
+  id String @id
+
+  name         String?
+  type         String?
+  organization String?
+  description  String?
+  updatedAt    DateTime
+  createdAt    DateTime
+  archivedAt   DateTime?
+  deletedAt    DateTime?
+
+  createdBy          String?
+  equipmentCreatedBy User?   @relation(name: "equipmentCreatedBy", fields: [createdBy], references: [id])
+  tenantId           String
+  tenant             Tenant  @relation(fields: [tenantId], references: [id])
+  userId             String?
+  user               User?   @relation(fields: [userId], references: [id])
+
+  dailyLogItems           DailyLogItem[]
+  equipmentPropertyValues EquipmentPropertyValue[]
+}
+
+model EquipmentProperty {
+  id String @id
+
+  name       String
+  createdAt  DateTime
+  updatedAt  DateTime
+  archivedAt DateTime?
+  deletedAt  DateTime?
+
+  createdBy     String?
+  createdByUser User?   @relation(fields: [createdBy], references: [id])
+  tenantId      String
+  tenant        Tenant  @relation(fields: [tenantId], references: [id])
+
+  equipmentPropertyValues EquipmentPropertyValue[]
+}
+
+model EquipmentPropertyValue {
+  id String @id
+
+  value      String
+  createdAt  DateTime
+  updatedAt  DateTime
+  archivedAt DateTime?
+  deletedAt  DateTime?
+
+  createdBy           String?
+  createdByUser       User?             @relation(fields: [createdBy], references: [id])
+  equipmentId         String
+  equipment           Equipment         @relation(fields: [equipmentId], references: [id])
+  equipmentPropertyId String
+  equipmentProperty   EquipmentProperty @relation(fields: [equipmentPropertyId], references: [id])
+  tenantId            String
+  tenant              Tenant            @relation(fields: [tenantId], references: [id])
+}
