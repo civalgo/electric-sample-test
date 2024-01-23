@@ -7,6 +7,10 @@
 - yarn
 - ios simulator or android emulator
 
+### Changes made to run
+
+- had to remove Int and JSONB columns from the database schema
+
 ### Run the app
 
 - `yarn`
